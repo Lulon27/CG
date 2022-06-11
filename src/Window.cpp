@@ -35,7 +35,7 @@ namespace cg
             return;
         }
 
-        glfwSwapInterval(0);
+        glfwSwapInterval(1);
         glfwSetWindowUserPointer(m_windowHandle, this);
 
         glfwSetWindowSizeCallback(m_windowHandle, [](GLFWwindow* window, int width, int height)
