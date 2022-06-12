@@ -155,9 +155,15 @@ void charCallback(unsigned int keycode)
     {
     case 'u': planet->position.y += 0.2f; break;
     case 'i': planet->position.y -= 0.2f; break;
-    case 'q': sphere->rotation.z += 1.0f; break;
-    case 'w': sphere->rotation.z -= 1.0f; break;
     case 'g': planetStopped = !planetStopped; break;
+    case 'q':
+        sphere->rotation.z += 1.0f;
+        sphere->rotation.z = glm::clamp(sphere->rotation.z, 0.0f, 360.0f);
+        break;
+    case 'w':
+        sphere->rotation.z -= 1.0f;
+        sphere->rotation.z = glm::clamp(sphere->rotation.z, 0.0f, 360.0f);
+        break;
     }
 }
 
