@@ -34,6 +34,30 @@ std::shared_ptr<cg::Object> axisPlanet;
 
 cg::Window window(WINDOW_WIDTH, WINDOW_HEIGHT);
 
+static std::shared_ptr<cg::Object> createSphereObj(uint8_t sd, float r, const glm::vec3& c, const std::string& shader, const std::string& dbgName = "")
+{
+    cg::MeshData mesh;
+    auto obj = std::make_shared<cg::Object>(dbgName);
+
+    cg::GeometryUtil::generateSphereModel(&mesh, sd, r, c);
+    obj->setMesh(mesh);
+    obj->setShader(shaderManager.getShader(shader));
+
+    return obj;
+}
+
+static std::shared_ptr<cg::Object> createLineObj(float len, const glm::vec3& c, const std::string& shader, const std::string& dbgName = "")
+{
+    cg::MeshData mesh;
+    auto obj = std::make_shared<cg::Object>(dbgName);
+
+    cg::GeometryUtil::generateLineModel(&mesh, len, { 0.0f, 1.0f, 0.0f }, c);
+    obj->setMesh(mesh);
+    obj->setShader(shaderManager.getShader(shader));
+
+    return obj;
+}
+
 /*
  Initialization. Should return true if everything is ok and false if something went wrong.
  */
@@ -60,45 +84,27 @@ bool createScene()
 
 
     // Sphere model
-    sphere = std::make_shared<cg::Object>("Sun");
-    cg::GeometryUtil::generateSphereModel(&mesh, 12, 0.75f);
-    sphere->setMesh(mesh);
-    sphere->setShader(shaderManager.getShader("default"));
+    sphere = createSphereObj(12, 0.75f, { 1.0f, 1.0f, 0.0f }, "default", "Sun");
 
 
     // Planet model
-    planet = std::make_shared<cg::Object>("Planet");
-    cg::GeometryUtil::generateSphereModel(&mesh, 8, 0.4f, { 0.8f, 0.2f, 0.2f });
-    planet->setMesh(mesh);
-    planet->setShader(shaderManager.getShader("default"));
+    planet = createSphereObj(8, 0.4f, { 0.8f, 0.2f, 0.2f }, "default", "Planet");
     planet->position.x = 2.5f;
 
 
     // Moons
-    moon1 = std::make_shared<cg::Object>("Moon 1");
-    cg::GeometryUtil::generateSphereModel(&mesh, 6, 0.25f, { 0.2f, 0.2f, 0.8f });
-    moon1->setMesh(mesh);
-    moon1->setShader(shaderManager.getShader("default"));
+    moon1 = createSphereObj(6, 0.25f, { 0.2f, 0.2f, 0.8f }, "default", "Moon 1");
     moon1->position.x = 1.0f;
 
-    moon2 = std::make_shared<cg::Object>("Moon 2");
-    cg::GeometryUtil::generateSphereModel(&mesh, 6, 0.25f, { 0.2f, 0.2f, 0.8f });
-    moon2->setMesh(mesh);
-    moon2->setShader(shaderManager.getShader("default"));
+    moon2 = createSphereObj(6, 0.25f, { 0.2f, 0.2f, 0.8f }, "default", "Moon 2");
     moon2->position.x = -1.0f;
 
 
     // Sun Axis model
-    axisSun = std::make_shared<cg::Object>("Sun Axis");
-    cg::GeometryUtil::generateLineModel(&mesh, 5.0f, { 0, 1, 0 }, { 1, 0, 0 });
-    axisSun->setMesh(mesh);
-    axisSun->setShader(shaderManager.getShader("default"));
+    axisSun = createLineObj(5.0f, { 1.0f, 0.0f, 0.0f }, "default", "Sun Axis");
 
     // Planet Axis model
-    axisPlanet = std::make_shared<cg::Object>("Planet Axis");
-    cg::GeometryUtil::generateLineModel(&mesh, 5.0f, { 0, 1, 0 }, { 1, 1, 0 });
-    axisPlanet->setMesh(mesh);
-    axisPlanet->setShader(shaderManager.getShader("default"));
+    axisPlanet = createLineObj(5.0f, { 1.0f, 1.0f, 0.0f }, "default", "Planet Axis");
 
 
     // Add to scene, do not add child objects to scene!
