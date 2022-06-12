@@ -11,33 +11,33 @@
 #include "CG/Window.h"
 
 // Standard window width
-const int WINDOW_WIDTH = 640;
+static const int WINDOW_WIDTH = 640;
 // Standard window height
-const int WINDOW_HEIGHT = 480;
+static const int WINDOW_HEIGHT = 480;
 
-float zNear = 0.1f;
-float zFar = 100.0f;
+static float zNear = 0.1f;
+static float zFar = 100.0f;
 
 static cg::ShaderManager shaderManager;
 
-cg::Scene scene;
+static cg::Scene scene;
 
-std::shared_ptr<cg::Object> origin;
+static std::shared_ptr<cg::Object> origin;
 
-std::shared_ptr<cg::Object> sphere;
-std::shared_ptr<cg::Object> planet;
-std::shared_ptr<cg::Object> moon1;
-std::shared_ptr<cg::Object> moon2;
-std::shared_ptr<cg::Object> moonsRotationAnchor;
+static std::shared_ptr<cg::Object> sphere;
+static std::shared_ptr<cg::Object> planet;
+static std::shared_ptr<cg::Object> moon1;
+static std::shared_ptr<cg::Object> moon2;
+static std::shared_ptr<cg::Object> moonsRotationAnchor;
 
-std::shared_ptr<cg::Object> axisSun;
-std::shared_ptr<cg::Object> axisPlanet;
+static std::shared_ptr<cg::Object> axisSun;
+static std::shared_ptr<cg::Object> axisPlanet;
 
-cg::Window window(WINDOW_WIDTH, WINDOW_HEIGHT);
+static cg::Window window(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-float rotationSpeed = 0.1f;
-float planetSpeedMod = 1.0f;
-bool planetStopped = false;
+static float rotationSpeed = 0.1f;
+static float planetSpeedMod = 1.0f;
+static bool planetStopped = false;
 
 static std::shared_ptr<cg::Object> createSphereObj(uint8_t sd, float r, const glm::vec3& c, const std::string& shader, const std::string& dbgName = "")
 {
@@ -161,6 +161,29 @@ void charCallback(unsigned int keycode)
     }
 }
 
+/**
+ * Called every frame in main loop.
+ * Contains the logic to update every object.
+ */
+static void updateLogic()
+{
+    planet->rotateAroundOrigin(rotationSpeed * planetSpeedMod, { 0, 1, 0 });
+    planet->rotation.y += glm::radians(rotationSpeed * planetSpeedMod);
+
+    moon1->rotateAroundOrigin(rotationSpeed * 2.0f, { 1, 0, 0 });
+    moon2->rotateAroundOrigin(rotationSpeed * 2.0f, { 1, 0, 0 });
+
+    // Calculate angle of vector between planet and sun
+    glm::vec3& pos = planet->position;
+    auto angle = std::atan2(glm::sqrt(pos.z * pos.z + pos.x * pos.x), pos.y) - glm::pi<float>() * 0.5f;
+
+    moonsRotationAnchor->rotation.z = -angle;
+
+    // Smooth planet acceleration / decceleration
+    planetSpeedMod += planetStopped ? -0.01f : 0.01f;
+    planetSpeedMod = glm::clamp(planetSpeedMod, 0.0f, 1.0f);
+}
+
 int main(int argc, char** argv)
 {
     if (window.getError())
@@ -208,24 +231,10 @@ int main(int argc, char** argv)
     while (!window.getShouldClose())
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        planet->rotateAroundOrigin(rotationSpeed * planetSpeedMod, { 0, 1, 0 });
-        planet->rotation.y += glm::radians(rotationSpeed * planetSpeedMod);
-
-        moon1->rotateAroundOrigin(rotationSpeed * 2.0f, { 1, 0, 0 });
-        moon2->rotateAroundOrigin(rotationSpeed * 2.0f, { 1, 0, 0 });
-
-        // Calculate angle of vector between planet and sun
-        glm::vec3& pos = planet->position;
-        auto angle = std::atan2(glm::sqrt(pos.z * pos.z + pos.x * pos.x), pos.y) - glm::pi<float>() * 0.5f;
-
-        moonsRotationAnchor->rotation.z = -angle;
-
-        // Smooth planet acceleration / decceleration
-        planetSpeedMod += planetStopped ? -0.01f : 0.01f;
-        planetSpeedMod = glm::clamp(planetSpeedMod, 0.0f, 1.0f);
-
         glfwPollEvents();
+        
+        updateLogic();
+
         scene.renderScene();
         window.swapBuffers();
     }
