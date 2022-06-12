@@ -19,9 +19,9 @@ namespace cg
 		// Translation
 		transform = glm::translate(transform, obj->position);
 		// Rotation
-		transform = glm::rotate(transform, obj->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-		transform = glm::rotate(transform, obj->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-		transform = glm::rotate(transform, obj->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+		transform = glm::rotate(transform, glm::radians(obj->rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		transform = glm::rotate(transform, glm::radians(obj->rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		transform = glm::rotate(transform, glm::radians(obj->rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
 		for (const std::shared_ptr<Object>& childObj : obj->getChildren())
 		{

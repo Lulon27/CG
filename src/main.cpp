@@ -35,7 +35,7 @@ static std::shared_ptr<cg::Object> axisPlanet;
 
 static cg::Window window(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-static float rotationSpeed = 0.1f;
+static float rotationSpeed = 0.2f;
 static float planetSpeedMod = 1.0f;
 static bool planetStopped = false;
 
@@ -168,7 +168,7 @@ void charCallback(unsigned int keycode)
 static void updateLogic()
 {
     planet->rotateAroundOrigin(rotationSpeed * planetSpeedMod, { 0, 1, 0 });
-    planet->rotation.y += glm::radians(rotationSpeed * planetSpeedMod);
+    planet->rotation.y += rotationSpeed * planetSpeedMod;
 
     moon1->rotateAroundOrigin(rotationSpeed * 2.0f, { 1, 0, 0 });
     moon2->rotateAroundOrigin(rotationSpeed * 2.0f, { 1, 0, 0 });
@@ -177,7 +177,7 @@ static void updateLogic()
     glm::vec3& pos = planet->position;
     auto angle = std::atan2(glm::sqrt(pos.z * pos.z + pos.x * pos.x), pos.y) - glm::pi<float>() * 0.5f;
 
-    moonsRotationAnchor->rotation.z = -angle;
+    moonsRotationAnchor->rotation.z = -glm::degrees(angle);
 
     // Smooth planet acceleration / decceleration
     planetSpeedMod += planetStopped ? -0.01f : 0.01f;
