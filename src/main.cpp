@@ -185,7 +185,7 @@ static void updateLogic()
     rotationSpeed += window.isKeyDown(GLFW_KEY_F) ? 0.002f : (window.isKeyDown(GLFW_KEY_D) ? -0.002f : 0.0f);
     rotationSpeed = glm::clamp(rotationSpeed, 0.0f, 2.0f);
 
-    // Smooth acceleration of planet and moons rotation
+    // Smooth rotation of solar system
     sphere->rotation.z += window.isKeyDown(GLFW_KEY_Q) ? 0.2f : (window.isKeyDown(GLFW_KEY_W) ? -0.2f : 0.0f);
     sphere->rotation.z = glm::clamp(sphere->rotation.z, 0.0f, 360.0f);
 }
