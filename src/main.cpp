@@ -28,11 +28,16 @@ std::shared_ptr<cg::Object> sphere;
 std::shared_ptr<cg::Object> planet;
 std::shared_ptr<cg::Object> moon1;
 std::shared_ptr<cg::Object> moon2;
+std::shared_ptr<cg::Object> moonsRotationAnchor;
 
 std::shared_ptr<cg::Object> axisSun;
 std::shared_ptr<cg::Object> axisPlanet;
 
 cg::Window window(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+float rotationSpeed = 0.1f;
+float planetSpeedMod = 1.0f;
+bool planetStopped = false;
 
 static std::shared_ptr<cg::Object> createSphereObj(uint8_t sd, float r, const glm::vec3& c, const std::string& shader, const std::string& dbgName = "")
 {
@@ -94,27 +99,30 @@ bool createScene()
 
     // Moons
     moon1 = createSphereObj(6, 0.25f, { 0.2f, 0.2f, 0.8f }, "default", "Moon 1");
-    moon1->position.x = 1.0f;
+    moon1->position.y = 1.0f;
 
     moon2 = createSphereObj(6, 0.25f, { 0.2f, 0.2f, 0.8f }, "default", "Moon 2");
-    moon2->position.x = -1.0f;
+    moon2->position.y = -1.0f;
+
+    moonsRotationAnchor = std::make_shared<cg::Object>();
 
 
     // Sun Axis model
-    axisSun = createLineObj(5.0f, { 1.0f, 0.0f, 0.0f }, "default", "Sun Axis");
+    axisSun = createLineObj(100.0f, { 1.0f, 0.0f, 0.0f }, "default", "Sun Axis");
 
     // Planet Axis model
-    axisPlanet = createLineObj(5.0f, { 1.0f, 1.0f, 0.0f }, "default", "Planet Axis");
+    axisPlanet = createLineObj(100.0f, { 1.0f, 1.0f, 0.0f }, "default", "Planet Axis");
 
 
     // Add to scene, do not add child objects to scene!
     scene.addObject(origin);
     scene.addObject(sphere);
 
-    // Relationships
+    // Make hierarchy
     sphere->addChild(planet);
-    planet->addChild(moon1);
-    planet->addChild(moon2);
+    planet->addChild(moonsRotationAnchor);
+    moonsRotationAnchor->addChild(moon1);
+    moonsRotationAnchor->addChild(moon2);
 
     sphere->addChild(axisSun);
     planet->addChild(axisPlanet);
@@ -143,6 +151,14 @@ void updateViewport(unsigned int width, unsigned int height)
 void charCallback(unsigned int keycode)
 {
     std::cout << "Pressed key \"" << (char)keycode << "\"\n";
+    switch (keycode)
+    {
+    case 'u': planet->position.y += 0.2f; break;
+    case 'i': planet->position.y -= 0.2f; break;
+    case 'q': sphere->rotation.z += 0.2f; break;
+    case 'w': sphere->rotation.z -= 0.2f; break;
+    case 'g': planetStopped = !planetStopped; break;
+    }
 }
 
 int main(int argc, char** argv)
@@ -193,10 +209,21 @@ int main(int argc, char** argv)
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        sphere->rotation.y += 0.01f;
-        planet->rotation.y += 0.01f;
-        sphere->position.y = glm::sin(glfwGetTime());
-        sphere->position.x = glm::cos(glfwGetTime());
+        planet->rotateAroundOrigin(rotationSpeed * planetSpeedMod, { 0, 1, 0 });
+        planet->rotation.y += glm::radians(rotationSpeed * planetSpeedMod);
+
+        moon1->rotateAroundOrigin(rotationSpeed * 2.0f, { 1, 0, 0 });
+        moon2->rotateAroundOrigin(rotationSpeed * 2.0f, { 1, 0, 0 });
+
+        // Calculate angle of vector between planet and sun
+        glm::vec3& pos = planet->position;
+        auto angle = std::atan2(glm::sqrt(pos.z * pos.z + pos.x * pos.x), pos.y) - glm::pi<float>() * 0.5f;
+
+        moonsRotationAnchor->rotation.z = -angle;
+
+        // Smooth planet acceleration / decceleration
+        planetSpeedMod += planetStopped ? -0.01f : 0.01f;
+        planetSpeedMod = glm::clamp(planetSpeedMod, 0.0f, 1.0f);
 
         glfwPollEvents();
         scene.renderScene();

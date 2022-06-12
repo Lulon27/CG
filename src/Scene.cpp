@@ -25,13 +25,16 @@ namespace cg
 
 		for (const std::shared_ptr<Object>& childObj : obj->getChildren())
 		{
-			if (childObj->getVAO() == 0)
-			{
-				continue;
-			}
 			// Recursively draw children by continuing with the current model matrix
 			// In order to transform them relative to their parent
 			drawWithTransform(childObj, transform, childObj->getVAO(), projView);
+		}
+
+		if (vaoID == 0)
+		{
+			// Doesn't have a VAO, cannot be rendered
+			// This can happen if there was an initialization error with the object
+			return;
 		}
 
 		// MVP
@@ -47,20 +50,11 @@ namespace cg
 
 	void Scene::renderScene()
 	{
-		GLuint vaoID;
 		glm::mat4x4 projView = m_camera.getProjection() * glm::lookAt(m_camera.getPosition(), center, up);
 
 		for(const std::shared_ptr<Object>& obj : m_objects)
 		{ 
-			vaoID = obj->getVAO();
-			if (vaoID == 0)
-			{
-				// Doesn't have a VAO, cannot be rendered
-				// This can happen if there was an initialization error with the object
-				continue;
-			}
-
-			drawWithTransform(obj, glm::mat4x4(1.0f), vaoID, projView);
+			drawWithTransform(obj, glm::mat4x4(1.0f), obj->getVAO(), projView);
 		}
 	}
 }

@@ -27,6 +27,8 @@ namespace cg
 		void addChild(std::shared_ptr<Object> obj) { m_children.push_back(obj); }
 		const std::vector< std::shared_ptr<Object>>& getChildren() { return m_children; }
 
+		void rotateAroundOrigin(float deg, const glm::vec3& axis);
+
 		glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
 		glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 

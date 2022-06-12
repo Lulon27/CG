@@ -92,4 +92,11 @@ namespace cg
 
 		glBindVertexArray(0);
 	}
+
+	void Object::rotateAroundOrigin(float deg, const glm::vec3& axis)
+	{
+		auto m = glm::rotate(glm::mat4x4(1.0f), glm::radians(deg), axis);
+
+		position = glm::make_vec3(m * glm::vec4(position, 0.0f));
+	}
 }
