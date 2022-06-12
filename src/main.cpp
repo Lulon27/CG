@@ -22,9 +22,15 @@ static cg::ShaderManager shaderManager;
 
 cg::Scene scene;
 
-std::shared_ptr<cg::Object> sphere;
 std::shared_ptr<cg::Object> origin;
+
+std::shared_ptr<cg::Object> sphere;
 std::shared_ptr<cg::Object> planet;
+std::shared_ptr<cg::Object> moon1;
+std::shared_ptr<cg::Object> moon2;
+
+std::shared_ptr<cg::Object> axisSun;
+std::shared_ptr<cg::Object> axisPlanet;
 
 cg::Window window(WINDOW_WIDTH, WINDOW_HEIGHT);
 
@@ -55,17 +61,44 @@ bool createScene()
 
     // Sphere model
     sphere = std::make_shared<cg::Object>("Sun");
-    cg::GeometryUtil::generateSphereModel(&mesh, 12, 1.0f);
+    cg::GeometryUtil::generateSphereModel(&mesh, 12, 0.75f);
     sphere->setMesh(mesh);
     sphere->setShader(shaderManager.getShader("default"));
 
 
     // Planet model
     planet = std::make_shared<cg::Object>("Planet");
-    cg::GeometryUtil::generateSphereModel(&mesh, 6, 0.25f);
+    cg::GeometryUtil::generateSphereModel(&mesh, 8, 0.4f, { 0.8f, 0.2f, 0.2f });
     planet->setMesh(mesh);
     planet->setShader(shaderManager.getShader("default"));
-    planet->position.x = 2.0f;
+    planet->position.x = 2.5f;
+
+
+    // Moons
+    moon1 = std::make_shared<cg::Object>("Moon 1");
+    cg::GeometryUtil::generateSphereModel(&mesh, 6, 0.25f, { 0.2f, 0.2f, 0.8f });
+    moon1->setMesh(mesh);
+    moon1->setShader(shaderManager.getShader("default"));
+    moon1->position.x = 1.0f;
+
+    moon2 = std::make_shared<cg::Object>("Moon 2");
+    cg::GeometryUtil::generateSphereModel(&mesh, 6, 0.25f, { 0.2f, 0.2f, 0.8f });
+    moon2->setMesh(mesh);
+    moon2->setShader(shaderManager.getShader("default"));
+    moon2->position.x = -1.0f;
+
+
+    // Sun Axis model
+    axisSun = std::make_shared<cg::Object>("Sun Axis");
+    cg::GeometryUtil::generateLineModel(&mesh, 5.0f, { 0, 1, 0 }, { 1, 0, 0 });
+    axisSun->setMesh(mesh);
+    axisSun->setShader(shaderManager.getShader("default"));
+
+    // Planet Axis model
+    axisPlanet = std::make_shared<cg::Object>("Planet Axis");
+    cg::GeometryUtil::generateLineModel(&mesh, 5.0f, { 0, 1, 0 }, { 1, 1, 0 });
+    axisPlanet->setMesh(mesh);
+    axisPlanet->setShader(shaderManager.getShader("default"));
 
 
     // Add to scene, do not add child objects to scene!
@@ -74,6 +107,11 @@ bool createScene()
 
     // Relationships
     sphere->addChild(planet);
+    planet->addChild(moon1);
+    planet->addChild(moon2);
+
+    sphere->addChild(axisSun);
+    planet->addChild(axisPlanet);
 
     scene.getCamera().setPosition(glm::vec3(0.0f, 1.0f, 4.0f));
 

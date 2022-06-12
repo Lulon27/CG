@@ -2,7 +2,7 @@
 
 namespace cg::GeometryUtil
 {
-    static void makeTriangles(cg::MeshData* model, glm::vec3 a, glm::vec3 b, glm::vec3 c, uint8_t n)
+    static void makeTriangles(cg::MeshData* model, glm::vec3 a, glm::vec3 b, glm::vec3 c, uint8_t n, glm::vec3 color)
     {
         if (n < 0)
         {
@@ -67,7 +67,7 @@ namespace cg::GeometryUtil
                 // Put vertices along the bridge
                 glm::vec3 vertex = ab_slide + currentLine * (x * edgeLengthInner);
                 model->vertices.push_back(vertex);
-                model->colors.emplace_back(1.0f, 1.0f, 0.0f);
+                model->colors.push_back(color);
             }
         }
 
@@ -101,7 +101,7 @@ namespace cg::GeometryUtil
         }
     }
 
-	void generateSphereModel(cg::MeshData* model, uint8_t n, float radius)
+	void generateSphereModel(cg::MeshData* model, uint8_t n, float radius, const glm::vec3& color)
 	{
         if (n < 0)
         {
@@ -119,56 +119,56 @@ namespace cg::GeometryUtil
             vec3(-radius, 0, -radius),
             vec3(0, 1, 0),
             vec3(radius, 0, -radius),
-            n);
+            n, color);
 
         // Top Back
         makeTriangles(model,
             vec3(-radius, 0, radius),
             vec3(0, 1, 0),
             vec3(radius, 0, radius),
-            n);
+            n, color);
 
         // Top Right
         makeTriangles(model,
             vec3(radius, 0, -radius),
             vec3(0, 1, 0),
             vec3(radius, 0, radius),
-            n);
+            n, color);
 
         // Top Left
         makeTriangles(model,
             vec3(-radius, 0, -radius),
             vec3(0, 1, 0),
             vec3(-radius, 0, radius),
-            n);
+            n, color);
 
         // Bottom Front
         makeTriangles(model,
             vec3(-radius, 0, -radius),
             vec3(0, -1, 0),
             vec3(radius, 0, -radius),
-            n);
+            n, color);
 
         // Bottom Back
         makeTriangles(model,
             vec3(-radius, 0, radius),
             vec3(0, -1, 0),
             vec3(radius, 0, radius),
-            n);
+            n, color);
 
         // Bottom Right
         makeTriangles(model,
             vec3(radius, 0, -radius),
             vec3(0, -1, 0),
             vec3(radius, 0, radius),
-            n);
+            n, color);
 
         // Bottom Left
         makeTriangles(model,
             vec3(-radius, 0, -radius),
             vec3(0, -1, 0),
             vec3(-radius, 0, radius),
-            n);
+            n, color);
 
         // Make octahedron into a sphere shape
         // by pushing vertices away from the center so that
@@ -216,4 +216,22 @@ namespace cg::GeometryUtil
 
         model->drawMode = GL_LINES;
 	}
+
+    void generateLineModel(cg::MeshData* model, float length, const glm::vec3& dir, const glm::vec3& color, const glm::vec3& center)
+    {
+        model->vertices.clear();
+        model->colors.clear();
+        model->indices.clear();
+        model->drawMode = GL_LINES;
+
+        model->vertices =
+        {
+            center + dir * 0.5f * length,
+            center - dir * 0.5f * length
+        };
+
+        model->colors = { color, color };
+
+        model->indices = { 0, 1 };
+    }
 }
