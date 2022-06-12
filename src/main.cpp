@@ -153,8 +153,6 @@ void charCallback(unsigned int keycode)
     std::cout << "Pressed key \"" << (char)keycode << "\"\n";
     switch (keycode)
     {
-    case 'u': planet->position.y += 0.2f; break;
-    case 'i': planet->position.y -= 0.2f; break;
     case 'g': planetStopped = !planetStopped; break;
     }
 }
@@ -188,6 +186,10 @@ static void updateLogic()
     // Smooth rotation of solar system
     sphere->rotation.z += window.isKeyDown(GLFW_KEY_Q) ? 0.2f : (window.isKeyDown(GLFW_KEY_W) ? -0.2f : 0.0f);
     sphere->rotation.z = glm::clamp(sphere->rotation.z, 0.0f, 360.0f);
+
+    // Smooth planet up/down movement
+    planet->position.y += window.isKeyDown(GLFW_KEY_U) ? 0.015f : (window.isKeyDown(GLFW_KEY_I) ? -0.015f : 0.0f);
+    planet->position.y = glm::clamp(planet->position.y, -10.0f, 10.0f);
 }
 
 int main(int argc, char** argv)
