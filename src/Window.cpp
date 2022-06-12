@@ -88,4 +88,10 @@ namespace cg
         glfwGetWindowSize(m_windowHandle, &width, &height);
         return height;
     }
+
+    bool Window::isKeyDown(int key) const
+    {
+        int state = glfwGetKey(m_windowHandle, key);
+        return state == GLFW_PRESS;
+    }
 }

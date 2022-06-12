@@ -18,6 +18,7 @@ namespace cg
 		bool getShouldClose() const;
 		unsigned int getWidth() const;
 		unsigned int getHeight() const;
+		bool isKeyDown(int key) const;
 
 		void swapBuffers();
 

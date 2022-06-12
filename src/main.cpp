@@ -188,6 +188,10 @@ static void updateLogic()
     // Smooth planet acceleration / decceleration
     planetSpeedMod += planetStopped ? -0.01f : 0.01f;
     planetSpeedMod = glm::clamp(planetSpeedMod, 0.0f, 1.0f);
+
+    // Smooth acceleration of planet and moons rotation
+    rotationSpeed += window.isKeyDown(GLFW_KEY_F) ? 0.002f : (window.isKeyDown(GLFW_KEY_D) ? -0.002f : 0.0f);
+    rotationSpeed = glm::clamp(rotationSpeed, 0.0f, 2.0f);
 }
 
 int main(int argc, char** argv)
