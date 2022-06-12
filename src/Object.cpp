@@ -4,7 +4,8 @@ namespace cg
 {
 	static void updateVAO(GLuint& vao, MeshGLInfo* meshInfo, GLSLProgram* shader);
 
-	Object::Object()
+	Object::Object(const std::string& debugName)
+		: m_debugName(debugName)
 	{
 
 	}

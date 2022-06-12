@@ -15,6 +15,7 @@ namespace cg
 		void addObject(std::shared_ptr<Object> obj);
 
 		Camera& getCamera() { return m_camera; }
+
 	private:
 		std::vector<std::shared_ptr<Object>> m_objects;
 		Camera m_camera;

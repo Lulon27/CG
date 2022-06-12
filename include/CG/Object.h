@@ -13,7 +13,7 @@ namespace cg
 	class Object
 	{
 	public:
-		Object();
+		Object(const std::string& debugName = "Object");
 		~Object();
 
 		void setShader(GLSLProgram* shader);
@@ -21,11 +21,14 @@ namespace cg
 
 		GLuint getVAO() { return m_vao; }
 		GLSLProgram* getShader() const { return m_shader; }
-		const glm::mat4x4& getModelMatrix() const { return m_model; }
 		unsigned int getIndexBufferSize() const { return m_meshInfo->getIndexBufferSize(); }
 		GLenum getDrawMode() const { return m_meshInfo->getDrawMode(); }
 
-		void setModelMatrix(const glm::mat4x4& mat) { m_model = mat; }
+		void addChild(std::shared_ptr<Object> obj) { m_children.push_back(obj); }
+		const std::vector< std::shared_ptr<Object>>& getChildren() { return m_children; }
+
+		glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
+		glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 
 	private:
 		Object(const Object&) = delete;
@@ -35,8 +38,6 @@ namespace cg
 		Object& operator=(Object&&) = delete;
 
 	private:
-		glm::mat4x4 m_model = glm::mat4x4(1.0f);
-
 		GLSLProgram* m_shader = nullptr;
 		std::shared_ptr<MeshGLInfo> m_meshInfo = nullptr;
 
@@ -44,5 +45,9 @@ namespace cg
 		// Updated if shader or mesh info changes
 		// If the VAO is not set (0), the object won't be rendered
 		GLuint m_vao = 0;
+
+		std::vector< std::shared_ptr<Object>> m_children;
+
+		std::string m_debugName;
 	};
 }

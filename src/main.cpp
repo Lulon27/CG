@@ -24,6 +24,7 @@ cg::Scene scene;
 
 std::shared_ptr<cg::Object> sphere;
 std::shared_ptr<cg::Object> origin;
+std::shared_ptr<cg::Object> planet;
 
 cg::Window window(WINDOW_WIDTH, WINDOW_HEIGHT);
 
@@ -47,21 +48,32 @@ bool createScene()
     cg::MeshData mesh;
     cg::GeometryUtil::generateOriginModel(&mesh);
 
-    origin = std::make_shared<cg::Object>();
+    origin = std::make_shared<cg::Object>("Origin");
     origin->setMesh(mesh);
     origin->setShader(shaderManager.getShader("default"));
 
 
     // Sphere model
-    sphere = std::make_shared<cg::Object>();
-    cg::GeometryUtil::generateSphereModel(&mesh, 3, 1.0f);
+    sphere = std::make_shared<cg::Object>("Sun");
+    cg::GeometryUtil::generateSphereModel(&mesh, 12, 1.0f);
     sphere->setMesh(mesh);
     sphere->setShader(shaderManager.getShader("default"));
 
 
-    // Add to scene
+    // Planet model
+    planet = std::make_shared<cg::Object>("Planet");
+    cg::GeometryUtil::generateSphereModel(&mesh, 6, 0.25f);
+    planet->setMesh(mesh);
+    planet->setShader(shaderManager.getShader("default"));
+    planet->position.x = 2.0f;
+
+
+    // Add to scene, do not add child objects to scene!
     scene.addObject(origin);
     scene.addObject(sphere);
+
+    // Relationships
+    sphere->addChild(planet);
 
     scene.getCamera().setPosition(glm::vec3(0.0f, 1.0f, 4.0f));
 
@@ -132,9 +144,15 @@ int main(int argc, char** argv)
     glEnable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+
     while (!window.getShouldClose())
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        sphere->rotation.y += 0.01f;
+        planet->rotation.y += 0.01f;
+        sphere->position.y = glm::sin(glfwGetTime());
+        sphere->position.x = glm::cos(glfwGetTime());
 
         glfwPollEvents();
         scene.renderScene();
