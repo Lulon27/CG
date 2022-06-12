@@ -119,7 +119,7 @@ bool createScene()
     sphere->addChild(axisSun);
     planet->addChild(axisPlanet);
 
-    scene.getCamera().setPosition(glm::vec3(0.0f, 1.0f, 4.0f));
+    scene.getCamera().setPosition(glm::vec3(0.0f, 1.0f, 6.0f));
 
     return true;
 }
