@@ -192,6 +192,13 @@ void charCallback(unsigned int keycode)
     }
 }
 
+template <typename T>
+static void inputSlideVal(T* var, const T& min, const T& max, const T& step, int keyMin, int keyMax)
+{
+    *var += window.isKeyDown(keyMax) ? step : (window.isKeyDown(keyMin) ? -step : 0.0f);
+    *var = glm::clamp(*var, min, max);
+}
+
 /**
  * Called every frame in main loop.
  * Contains the logic to update every object.
@@ -215,16 +222,13 @@ static void updateLogic()
     planetSpeedMod = glm::clamp(planetSpeedMod, 0.0f, 1.0f);
 
     // Smooth acceleration of planet and moons rotation
-    rotationSpeed += window.isKeyDown(GLFW_KEY_F) ? 0.002f : (window.isKeyDown(GLFW_KEY_D) ? -0.002f : 0.0f);
-    rotationSpeed = glm::clamp(rotationSpeed, 0.0f, 2.0f);
+    inputSlideVal(&rotationSpeed, 0.0f, 2.0f, 0.002f, GLFW_KEY_D, GLFW_KEY_F);
 
     // Smooth rotation of solar system
-    sphere->rotation.z += window.isKeyDown(GLFW_KEY_Q) ? 0.2f : (window.isKeyDown(GLFW_KEY_W) ? -0.2f : 0.0f);
-    sphere->rotation.z = glm::clamp(sphere->rotation.z, 0.0f, 360.0f);
+    inputSlideVal(&sphere->rotation.z, 0.0f, 360.0f, 0.2f, GLFW_KEY_W, GLFW_KEY_Q);
 
     // Smooth planet up/down movement
-    planet->position.y += window.isKeyDown(GLFW_KEY_U) ? 0.015f : (window.isKeyDown(GLFW_KEY_I) ? -0.015f : 0.0f);
-    planet->position.y = glm::clamp(planet->position.y, -10.0f, 10.0f);
+    inputSlideVal(&planet->position.y, -10.0f, 10.0f, 0.015f, GLFW_KEY_I, GLFW_KEY_U);
 }
 
 int main(int argc, char** argv)
