@@ -166,6 +166,16 @@ static void toggleNormalsAll()
     }
 }
 
+static void toggleWireframe()
+{
+    static bool wireframe = false;
+
+    wireframe = !wireframe;
+
+    glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
+
+}
+
 /*
  Resize callback.
  */
@@ -189,6 +199,7 @@ void charCallback(unsigned int keycode)
     {
     case 'g': planetStopped = !planetStopped; break;
     case 'n': toggleNormalsAll(); break;
+    case 'z': toggleWireframe(); break;
     }
 }
 
@@ -272,7 +283,6 @@ int main(int argc, char** argv)
 
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glEnable(GL_DEPTH_TEST);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 
     while (!window.getShouldClose())
