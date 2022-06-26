@@ -10,11 +10,8 @@ namespace cg
 	class ShaderManager
 	{
 	public:
-		bool loadShader(const std::string& name, std::initializer_list<std::pair<std::string, GLSLShader::GLSLShaderType>> list);
-		GLSLProgram* getShader(const std::string& name);
-		int getShaderID(const std::string& name);
-
-	private:
-		std::unordered_map<std::string, GLSLProgram> m_programs;
+		static bool loadShader(const std::string& name, std::initializer_list<std::pair<std::string, GLSLShader::GLSLShaderType>> list);
+		static GLSLProgram* getShader(const std::string& name);
+		static int getShaderID(const std::string& name);
 	};
 }

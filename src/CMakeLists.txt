@@ -1,5 +1,5 @@
 set(FILES_CPP	"main.cpp"
-				"GLSLProgram.cpp" "ShaderManager.cpp" "MeshGLInfo.cpp" "Object.cpp" "Scene.cpp" "GeometryUtil.cpp" "Window.cpp")
+				"GLSLProgram.cpp" "ShaderManager.cpp" "MeshGLInfo.cpp" "Object.cpp" "Scene.cpp" "GeometryUtil.cpp" "Window.cpp" "VertexArrayObject.cpp")
 
 include_directories(CG PUBLIC	"${CMAKE_SOURCE_DIR}/include"
 								"${CMAKE_SOURCE_DIR}/libs/glfw/include"

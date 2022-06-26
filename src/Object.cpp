@@ -1,96 +1,50 @@
 #include "CG/Object.h"
 
+#include "CG/GeometryUtil.h"
+#include "CG/ShaderManager.h"
+
 namespace cg
 {
-	static void updateVAO(GLuint& vao, MeshGLInfo* meshInfo, GLSLProgram* shader);
+	static void updateNormalsModel(std::shared_ptr<cg::Object> normalsObj, const MeshData* mesh);
 
 	Object::Object(const std::string& debugName)
 		: m_debugName(debugName)
 	{
-
+		
 	}
 
 	Object::~Object()
 	{
-		if (m_vao > 0)
-		{
-			std::cout << "Deleted Vertex Array: " << m_vao << "\n";
-			glDeleteVertexArrays(1, &m_vao);
-		}
+
 	}
 
 	void Object::setShader(GLSLProgram* shader)
 	{
 		m_shader = shader;
-		updateVAO(m_vao, m_meshInfo.get(), m_shader);
+		updateVAO();
 	}
 
 	void Object::setMesh(const MeshData& mesh)
 	{
 		m_meshInfo = MeshGLInfo::generate(mesh);
-		updateVAO(m_vao, m_meshInfo.get(), m_shader);
+		updateVAO();
+		//updateNormalsModel(m_normalsDisplayObj, &mesh);
 	}
 
-	void updateVAO(GLuint& vao, MeshGLInfo* meshInfo, GLSLProgram* shader)
+	void Object::updateVAO()
 	{
-		if (meshInfo == nullptr || shader == nullptr)
+		if (m_meshInfo == nullptr || m_shader == nullptr)
 		{
-			if (vao > 0)
-			{
-				std::cout << "Deleted Vertex Array: " << vao << "\n";
-				glDeleteVertexArrays(1, &vao);
-				vao = 0;
-			}
+			m_vao.deleteVAO();
 			return;
 		}
 
-		if (vao > 0)
-		{
-			std::cout << "Deleted Vertex Array: " << vao << "\n";
-			glDeleteVertexArrays(1, &vao);
-			vao = 0;
-		}
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-		std::cout << "Generated Vertex Array: " << vao << "\n";
+		m_vao.deleteVAO();
+		m_vao.generateVAO();
 
-
-		GLint location;
-		//Enable position attribute
-		glBindBuffer(GL_ARRAY_BUFFER, meshInfo->getPositionBufferID());
-		location = glGetAttribLocation(shader->getHandle(), "position");
-		if (location == -1)
-		{
-			std::cerr << "Failed to init set up VAO: " << vao << "\n";
-			std::cerr << "Shader program " << shader->getHandle() << " does not have attribute \"position\"\n";
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			glDeleteVertexArrays(1, &vao);
-			std::cout << "Deleted Vertex Array: " << vao << "\n";
-			vao = 0;
-			return;
-		}
-		glEnableVertexAttribArray(location);
-		glVertexAttribPointer(location, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-
-		//Enable color attribute
-		glBindBuffer(GL_ARRAY_BUFFER, meshInfo->getColorBufferID());
-		location = glGetAttribLocation(shader->getHandle(), "color");
-		if (location == -1)
-		{
-			std::cerr << "Shader program " << shader->getHandle() << " does not have attribute \"color\"\n";
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			glDeleteVertexArrays(1, &vao);
-			std::cout << "Deleted Vertex Array: " << vao << "\n";
-			vao = 0;
-			return;
-		}
-		glEnableVertexAttribArray(location);
-		glVertexAttribPointer(location, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshInfo->getIndexBufferID());
-
-		glBindVertexArray(0);
+		m_vao.bindShaderAttribVec3f(m_meshInfo->getPositionBufferID(), m_shader, "position");
+		m_vao.bindShaderAttribVec3f(m_meshInfo->getColorBufferID(), m_shader, "color");
+		m_vao.bindIndexBuffer(m_meshInfo->getIndexBufferID());
 	}
 
 	void Object::rotateAroundOrigin(float deg, const glm::vec3& axis)
@@ -98,5 +52,31 @@ namespace cg
 		auto m = glm::rotate(glm::mat4x4(1.0f), glm::radians(deg), axis);
 
 		position = glm::make_vec3(m * glm::vec4(position, 0.0f));
+	}
+
+	void updateNormalsModel(std::shared_ptr<cg::Object> normalsObj, const MeshData* mesh)
+	{
+		// Generate model for displaying normals
+		cg::MeshData normalsMesh;
+		cg::GeometryUtil::generateNormalDisplayObj(&normalsMesh, mesh);
+
+		normalsObj->setMesh(normalsMesh);
+	}
+
+	void Object::showNormals()
+	{
+		/*
+		if (!hasChild(m_normalsDisplayObj))
+		{
+			addChild(m_normalsDisplayObj);
+		}
+		*/
+	}
+
+	void Object::hideNormals()
+	{
+		/*
+		removeChild(m_normalsDisplayObj);
+		*/
 	}
 }

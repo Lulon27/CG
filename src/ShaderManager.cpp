@@ -2,10 +2,12 @@
 
 namespace cg
 {
+    static std::unordered_map<std::string, GLSLProgram> programs;
+
 	bool ShaderManager::loadShader(const std::string& name, std::initializer_list<std::pair<std::string, GLSLShader::GLSLShaderType>> list)
 	{
         // Put an empty program into the map
-		GLSLProgram& program = m_programs.emplace(std::piecewise_construct, std::make_tuple(name), std::make_tuple()).first->second;
+		GLSLProgram& program = programs.emplace(std::piecewise_construct, std::make_tuple(name), std::make_tuple()).first->second;
 
         for (const auto& [path, type] : list)
         {
@@ -27,11 +29,11 @@ namespace cg
 
     GLSLProgram* ShaderManager::getShader(const std::string& name)
     {
-        return &m_programs[name];
+        return &programs[name];
     }
 
     int ShaderManager::getShaderID(const std::string& name)
     {
-        return m_programs[name].getHandle();
+        return programs[name].getHandle();
     }
 }

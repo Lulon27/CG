@@ -1,4 +1,5 @@
 #include <iostream>
+#include <tuple>
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -18,8 +19,6 @@ static const int WINDOW_HEIGHT = 480;
 static float zNear = 0.1f;
 static float zFar = 100.0f;
 
-static cg::ShaderManager shaderManager;
-
 static cg::Scene scene;
 
 static std::shared_ptr<cg::Object> origin;
@@ -33,22 +32,35 @@ static std::shared_ptr<cg::Object> moonsRotationAnchor;
 static std::shared_ptr<cg::Object> axisSun;
 static std::shared_ptr<cg::Object> axisPlanet;
 
+static std::shared_ptr<cg::Object> normalsSphere;
+static std::shared_ptr<cg::Object> normalsPlanet;
+static std::shared_ptr<cg::Object> normalsMoon1;
+static std::shared_ptr<cg::Object> normalsMoon2;
+
 static cg::Window window(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 static float rotationSpeed = 0.2f;
 static float planetSpeedMod = 1.0f;
 static bool planetStopped = false;
 
-static std::shared_ptr<cg::Object> createSphereObj(uint8_t sd, float r, const glm::vec3& c, const std::string& shader, const std::string& dbgName = "")
+static std::tuple<std::shared_ptr<cg::Object>, std::shared_ptr<cg::Object>> createSphereObj(uint8_t sd, float r, const glm::vec3& c, const std::string& shader, const std::string& dbgName = "")
 {
     cg::MeshData mesh;
     auto obj = std::make_shared<cg::Object>(dbgName);
 
     cg::GeometryUtil::generateSphereModel(&mesh, sd, r, c);
     obj->setMesh(mesh);
-    obj->setShader(shaderManager.getShader(shader));
+    obj->setShader(cg::ShaderManager::getShader(shader));
 
-    return obj;
+    cg::MeshData meshNormalObj;
+    cg::GeometryUtil::generateNormalDisplayObj(&meshNormalObj, &mesh);
+
+
+    auto normalsObj = std::make_shared<cg::Object>(dbgName);
+    normalsObj->setMesh(meshNormalObj);
+    normalsObj->setShader(cg::ShaderManager::getShader("default"));
+
+    return { obj, normalsObj };
 }
 
 static std::shared_ptr<cg::Object> createLineObj(float len, const glm::vec3& c, const std::string& shader, const std::string& dbgName = "")
@@ -58,7 +70,7 @@ static std::shared_ptr<cg::Object> createLineObj(float len, const glm::vec3& c, 
 
     cg::GeometryUtil::generateLineModel(&mesh, len, { 0.0f, 1.0f, 0.0f }, c);
     obj->setMesh(mesh);
-    obj->setShader(shaderManager.getShader(shader));
+    obj->setShader(cg::ShaderManager::getShader(shader));
 
     return obj;
 }
@@ -68,7 +80,7 @@ static std::shared_ptr<cg::Object> createLineObj(float len, const glm::vec3& c, 
  */
 bool createScene()
 {
-    bool shaderLoaded = shaderManager.loadShader("default",
+    bool shaderLoaded = cg::ShaderManager::loadShader("default",
     {
         { "shader/simple.vert", cg::GLSLShader::GLSLShaderType::VERTEX },
         { "shader/simple.frag", cg::GLSLShader::GLSLShaderType::FRAGMENT }
@@ -85,23 +97,23 @@ bool createScene()
 
     origin = std::make_shared<cg::Object>("Origin");
     origin->setMesh(mesh);
-    origin->setShader(shaderManager.getShader("default"));
+    origin->setShader(cg::ShaderManager::getShader("default"));
 
 
     // Sphere model
-    sphere = createSphereObj(12, 0.75f, { 1.0f, 1.0f, 0.0f }, "default", "Sun");
+    std::tie(sphere, normalsSphere) = createSphereObj(12, 0.75f, {1.0f, 1.0f, 0.0f}, "default", "Sun");
 
 
     // Planet model
-    planet = createSphereObj(8, 0.4f, { 0.8f, 0.2f, 0.2f }, "default", "Planet");
+    std::tie(planet, normalsPlanet) = createSphereObj(8, 0.4f, { 0.8f, 0.2f, 0.2f }, "default", "Planet");
     planet->position.x = 2.5f;
 
 
     // Moons
-    moon1 = createSphereObj(6, 0.25f, { 0.2f, 0.2f, 0.8f }, "default", "Moon 1");
+    std::tie(moon1, normalsMoon1) = createSphereObj(6, 0.25f, { 0.2f, 0.2f, 0.8f }, "default", "Moon 1");
     moon1->position.y = 1.0f;
 
-    moon2 = createSphereObj(6, 0.25f, { 0.2f, 0.2f, 0.8f }, "default", "Moon 2");
+    std::tie(moon2, normalsMoon2) = createSphereObj(6, 0.25f, { 0.2f, 0.2f, 0.8f }, "default", "Moon 2");
     moon2->position.y = -1.0f;
 
     moonsRotationAnchor = std::make_shared<cg::Object>();
@@ -132,6 +144,28 @@ bool createScene()
     return true;
 }
 
+static void toggleNormalsAll()
+{
+    static bool normalsOn = false;
+
+    normalsOn = !normalsOn;
+
+    if (normalsOn)
+    {
+        sphere->addChild(normalsSphere);
+        planet->addChild(normalsPlanet);
+        moon1->addChild(normalsMoon1);
+        moon2->addChild(normalsMoon2);
+    }
+    else
+    {
+        sphere->removeChild(normalsSphere);
+        planet->removeChild(normalsPlanet);
+        moon1->removeChild(normalsMoon1);
+        moon2->removeChild(normalsMoon2);
+    }
+}
+
 /*
  Resize callback.
  */
@@ -154,6 +188,7 @@ void charCallback(unsigned int keycode)
     switch (keycode)
     {
     case 'g': planetStopped = !planetStopped; break;
+    case 'n': toggleNormalsAll(); break;
     }
 }
 

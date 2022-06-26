@@ -1,6 +1,7 @@
 #include "CG/Scene.h"
 
 #include "CG/GLSLProgram.h"
+#include "CG/VertexArrayObject.h"
 
 #include <glm/glm.hpp>
 
@@ -14,7 +15,7 @@ namespace cg
 		m_objects.push_back(obj);
 	}
 
-	void drawWithTransform(const std::shared_ptr<Object>& obj, glm::mat4x4 transform, GLuint vaoID, const glm::mat4x4& projView)
+	void drawWithTransform(const std::shared_ptr<Object>& obj, glm::mat4x4 transform, VertexArrayObject& vao, const glm::mat4x4& projView)
 	{
 		// Translation
 		transform = glm::translate(transform, obj->position);
@@ -30,7 +31,7 @@ namespace cg
 			drawWithTransform(childObj, transform, childObj->getVAO(), projView);
 		}
 
-		if (vaoID == 0)
+		if (vao.getVAO() == 0)
 		{
 			// Doesn't have a VAO, cannot be rendered
 			// This can happen if there was an initialization error with the object
@@ -43,7 +44,7 @@ namespace cg
 		GLSLProgram* shader = obj->getShader();
 		glUseProgram(shader->getHandle());
 		shader->setUniform("mvp", transform);
-		glBindVertexArray(vaoID);
+		glBindVertexArray(vao.getVAO());
 		glDrawElements(obj->getDrawMode(), obj->getIndexBufferSize(), GL_UNSIGNED_SHORT, 0);
 		glBindVertexArray(0);
 	}

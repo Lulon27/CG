@@ -3,10 +3,12 @@
 #include <glm/glm.hpp>
 #include <string>
 #include <memory>
+#include <algorithm>
 
 #include "CG/MeshGLInfo.h"
 #include "CG/MeshData.h"
 #include "CG/GLSLProgram.h"
+#include "CG/VertexArrayObject.h"
 
 namespace cg
 {
@@ -19,15 +21,22 @@ namespace cg
 		void setShader(GLSLProgram* shader);
 		void setMesh(const MeshData& mesh);
 
-		GLuint getVAO() { return m_vao; }
+		VertexArrayObject& getVAO() { return m_vao; }
 		GLSLProgram* getShader() const { return m_shader; }
 		unsigned int getIndexBufferSize() const { return m_meshInfo->getIndexBufferSize(); }
 		GLenum getDrawMode() const { return m_meshInfo->getDrawMode(); }
 
 		void addChild(std::shared_ptr<Object> obj) { m_children.push_back(obj); }
+		bool hasChild(std::shared_ptr<Object> obj) { return std::find(m_children.begin(), m_children.end(), obj) != m_children.end(); }
+		void removeChild(std::shared_ptr<Object> obj) { std::erase(m_children, obj); }
 		const std::vector< std::shared_ptr<Object>>& getChildren() { return m_children; }
 
 		void rotateAroundOrigin(float deg, const glm::vec3& axis);
+
+		void showNormals();
+		void hideNormals();
+
+		void updateVAO();
 
 		glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
 
@@ -48,10 +57,12 @@ namespace cg
 		// vertex-array-object ID
 		// Updated if shader or mesh info changes
 		// If the VAO is not set (0), the object won't be rendered
-		GLuint m_vao = 0;
+		VertexArrayObject m_vao;
 
 		std::vector< std::shared_ptr<Object>> m_children;
 
 		std::string m_debugName;
+
+		//std::shared_ptr<Object> m_normalsDisplayObj;
 	};
 }

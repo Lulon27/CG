@@ -108,9 +108,7 @@ namespace cg::GeometryUtil
             return;
         }
 
-        model->vertices.clear();
-        model->colors.clear();
-        model->indices.clear();
+        model->clearAll();
 
         using namespace glm;
 
@@ -176,7 +174,9 @@ namespace cg::GeometryUtil
         for (size_t i = 0; i < model->vertices.size(); ++i)
         {
             auto vertex = model->vertices[i];
-            model->vertices[i] *= radius / glm::length(vertex);
+            vec3 normal = vertex / glm::length(vertex);
+            model->normals.push_back(normal);
+            model->vertices[i] = radius * normal;
         }
 
         model->drawMode = GL_TRIANGLES;
@@ -184,9 +184,7 @@ namespace cg::GeometryUtil
 
 	void generateOriginModel(cg::MeshData* model)
 	{
-        model->vertices.clear();
-        model->colors.clear();
-        model->indices.clear();
+        model->clearAll();
 
         // Origin symbol
         model->vertices =
@@ -219,9 +217,8 @@ namespace cg::GeometryUtil
 
     void generateLineModel(cg::MeshData* model, float length, const glm::vec3& dir, const glm::vec3& color, const glm::vec3& center)
     {
-        model->vertices.clear();
-        model->colors.clear();
-        model->indices.clear();
+        model->clearAll();
+
         model->drawMode = GL_LINES;
 
         model->vertices =
@@ -233,5 +230,29 @@ namespace cg::GeometryUtil
         model->colors = { color, color };
 
         model->indices = { 0, 1 };
+    }
+
+    void generateNormalDisplayObj(cg::MeshData* model, const cg::MeshData* modelWithNormals, float normalLength, const glm::vec3& color)
+    {
+        model->clearAll();
+
+        model->drawMode = GL_LINES;
+
+        if (modelWithNormals->normals.size() != modelWithNormals->vertices.size())
+        {
+            return;
+        }
+
+        for (size_t i = 0; i < modelWithNormals->normals.size(); ++i)
+        {
+            model->vertices.push_back(modelWithNormals->vertices[i]);
+            model->vertices.push_back(modelWithNormals->vertices[i] + modelWithNormals->normals[i] * normalLength);
+
+            model->indices.push_back(i * 2);
+            model->indices.push_back(i * 2 + 1);
+
+            model->colors.push_back(color);
+            model->colors.push_back(color);
+        }
     }
 }
