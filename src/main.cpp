@@ -42,6 +42,7 @@ static cg::Window window(WINDOW_WIDTH, WINDOW_HEIGHT);
 static float rotationSpeed = 0.2f;
 static float planetSpeedMod = 1.0f;
 static bool planetStopped = false;
+static float camDistance = 10.0f;
 
 static std::tuple<std::shared_ptr<cg::Object>, std::shared_ptr<cg::Object>> createSphereObj(uint8_t sd, float r, const glm::vec3& c, const std::string& shader, const std::string& dbgName = "")
 {
@@ -240,6 +241,14 @@ static void updateLogic()
 
     // Smooth planet up/down movement
     inputSlideVal(&planet->position.y, -10.0f, 10.0f, 0.015f, GLFW_KEY_I, GLFW_KEY_U);
+
+    // Smooth camera zoom
+    inputSlideVal(&camDistance, 3.5f, 15.0f, 0.05f, GLFW_KEY_A, GLFW_KEY_S);
+
+    auto camPos = scene.getCamera().getPosition();
+    camPos /= glm::length(camPos);
+    camPos *= camDistance;
+    scene.getCamera().setPosition(camPos);
 }
 
 int main(int argc, char** argv)
