@@ -30,6 +30,8 @@ namespace cg
 		bool hasChild(std::shared_ptr<Object> obj) { return std::find(m_children.begin(), m_children.end(), obj) != m_children.end(); }
 		void removeChild(std::shared_ptr<Object> obj) { std::erase(m_children, obj); }
 		const std::vector< std::shared_ptr<Object>>& getChildren() { return m_children; }
+		void setColor(const glm::vec3& color) { m_color = color; }
+		const glm::vec3& getColor() const { return m_color; }
 
 		void rotateAroundOrigin(float deg, const glm::vec3& axis);
 
@@ -62,6 +64,8 @@ namespace cg
 		std::vector< std::shared_ptr<Object>> m_children;
 
 		std::string m_debugName;
+
+		glm::vec3 m_color;
 
 		//std::shared_ptr<Object> m_normalsDisplayObj;
 	};

@@ -16,6 +16,7 @@ namespace cg
 
         GLuint getPositionBufferID() const { return m_positionBuffer; }
         GLuint getColorBufferID() const { return m_colorBuffer; }
+        GLuint getNormalBufferID() const { return m_normalBuffer; }
         GLuint getIndexBufferID() const { return m_indexBuffer; }
         GLuint getIndexBufferSize() const { return m_drawAmount; }
         GLenum getDrawMode() const { return m_drawMode; }
@@ -32,6 +33,7 @@ namespace cg
     private:
         GLuint m_positionBuffer; // ID of vertex-buffer: position
         GLuint m_colorBuffer;    // ID of vertex-buffer: color
+        GLuint m_normalBuffer;   // ID of vertex-buffer: normal
 
         GLuint m_indexBuffer;    // ID of index-buffer
 

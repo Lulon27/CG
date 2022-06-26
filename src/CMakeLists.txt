@@ -13,3 +13,12 @@ target_link_libraries (CG glfw glad)
 
 configure_file("${CMAKE_SOURCE_DIR}/shader/simple.frag" "shader/simple.frag" COPYONLY)
 configure_file("${CMAKE_SOURCE_DIR}/shader/simple.vert" "shader/simple.vert" COPYONLY)
+
+configure_file("${CMAKE_SOURCE_DIR}/shader/shaded.frag" "shader/shaded.frag" COPYONLY)
+configure_file("${CMAKE_SOURCE_DIR}/shader/shaded.vert" "shader/shaded.vert" COPYONLY)
+
+configure_file("${CMAKE_SOURCE_DIR}/shader/shadedPhong.frag" "shader/shadedPhong.frag" COPYONLY)
+configure_file("${CMAKE_SOURCE_DIR}/shader/shadedPhong.vert" "shader/shadedPhong.vert" COPYONLY)
+
+configure_file("${CMAKE_SOURCE_DIR}/shader/shadedGouraud.frag" "shader/shadedGouraud.frag" COPYONLY)
+configure_file("${CMAKE_SOURCE_DIR}/shader/shadedGouraud.vert" "shader/shadedGouraud.vert" COPYONLY)

@@ -43,6 +43,9 @@ static float rotationSpeed = 0.2f;
 static float planetSpeedMod = 1.0f;
 static bool planetStopped = false;
 static float camDistance = 10.0f;
+static const char* shaderSwitch[] = {"default", "phong", "gouraud"};
+static const unsigned int shaderSwitchAmount = 3;
+static unsigned int currentShaderIndex = 0;
 
 static std::tuple<std::shared_ptr<cg::Object>, std::shared_ptr<cg::Object>> createSphereObj(uint8_t sd, float r, const glm::vec3& c, const std::string& shader, const std::string& dbgName = "")
 {
@@ -52,6 +55,7 @@ static std::tuple<std::shared_ptr<cg::Object>, std::shared_ptr<cg::Object>> crea
     cg::GeometryUtil::generateSphereModel(&mesh, sd, r, c);
     obj->setMesh(mesh);
     obj->setShader(cg::ShaderManager::getShader(shader));
+    obj->setColor(c);
 
     cg::MeshData meshNormalObj;
     cg::GeometryUtil::generateNormalDisplayObj(&meshNormalObj, &mesh);
@@ -81,16 +85,29 @@ static std::shared_ptr<cg::Object> createLineObj(float len, const glm::vec3& c, 
  */
 bool createScene()
 {
-    bool shaderLoaded = cg::ShaderManager::loadShader("default",
+    if(!cg::ShaderManager::loadShader("default",
     {
         { "shader/simple.vert", cg::GLSLShader::GLSLShaderType::VERTEX },
         { "shader/simple.frag", cg::GLSLShader::GLSLShaderType::FRAGMENT }
-    });
+    })) return false;
 
-    if (!shaderLoaded)
+    if (!cg::ShaderManager::loadShader("shaded",
     {
-        return false;
-    }
+        { "shader/shaded.vert", cg::GLSLShader::GLSLShaderType::VERTEX },
+        { "shader/shaded.frag", cg::GLSLShader::GLSLShaderType::FRAGMENT }
+    })) return false;
+
+    if (!cg::ShaderManager::loadShader("phong",
+    {
+        { "shader/shadedPhong.vert", cg::GLSLShader::GLSLShaderType::VERTEX },
+        { "shader/shadedPhong.frag", cg::GLSLShader::GLSLShaderType::FRAGMENT }
+    })) return false;
+
+    if (!cg::ShaderManager::loadShader("gouraud",
+    {
+        { "shader/shadedGouraud.vert", cg::GLSLShader::GLSLShaderType::VERTEX },
+        { "shader/shadedGouraud.frag", cg::GLSLShader::GLSLShaderType::FRAGMENT }
+    })) return false;
 
     // Origin symbol
     cg::MeshData mesh;
@@ -102,19 +119,19 @@ bool createScene()
 
 
     // Sphere model
-    std::tie(sphere, normalsSphere) = createSphereObj(12, 0.75f, {1.0f, 1.0f, 0.0f}, "default", "Sun");
+    std::tie(sphere, normalsSphere) = createSphereObj(12, 0.75f, {1.0f, 1.0f, 0.0f}, "phong", "Sun");
 
 
     // Planet model
-    std::tie(planet, normalsPlanet) = createSphereObj(8, 0.4f, { 0.8f, 0.2f, 0.2f }, "default", "Planet");
+    std::tie(planet, normalsPlanet) = createSphereObj(8, 0.4f, { 0.8f, 0.2f, 0.2f }, "phong", "Planet");
     planet->position.x = 2.5f;
 
 
     // Moons
-    std::tie(moon1, normalsMoon1) = createSphereObj(6, 0.25f, { 0.2f, 0.2f, 0.8f }, "default", "Moon 1");
+    std::tie(moon1, normalsMoon1) = createSphereObj(6, 0.25f, { 0.2f, 0.2f, 0.8f }, "phong", "Moon 1");
     moon1->position.y = 1.0f;
 
-    std::tie(moon2, normalsMoon2) = createSphereObj(6, 0.25f, { 0.2f, 0.2f, 0.8f }, "default", "Moon 2");
+    std::tie(moon2, normalsMoon2) = createSphereObj(6, 0.25f, { 0.2f, 0.2f, 0.8f }, "phong", "Moon 2");
     moon2->position.y = -1.0f;
 
     moonsRotationAnchor = std::make_shared<cg::Object>();
@@ -177,6 +194,16 @@ static void toggleWireframe()
 
 }
 
+static void switchNextShader()
+{
+    currentShaderIndex = (currentShaderIndex + 1) % shaderSwitchAmount;
+
+    sphere->setShader(cg::ShaderManager::getShader(shaderSwitch[currentShaderIndex]));
+    planet->setShader(cg::ShaderManager::getShader(shaderSwitch[currentShaderIndex]));
+    moon1->setShader(cg::ShaderManager::getShader(shaderSwitch[currentShaderIndex]));
+    moon2->setShader(cg::ShaderManager::getShader(shaderSwitch[currentShaderIndex]));
+}
+
 /*
  Resize callback.
  */
@@ -201,6 +228,8 @@ void charCallback(unsigned int keycode)
     case 'g': planetStopped = !planetStopped; break;
     case 'n': toggleNormalsAll(); break;
     case 'z': toggleWireframe(); break;
+    case 'l': scene.setUseViewLight(!scene.getUseViewLight()); break;
+    case 'h': switchNextShader(); break;
     }
 }
 

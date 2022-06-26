@@ -8,12 +8,14 @@ namespace cg
 	{
 		glGenBuffers(1, &m_positionBuffer);
 		glGenBuffers(1, &m_colorBuffer);
+		glGenBuffers(1, &m_normalBuffer);
 		glGenBuffers(1, &m_indexBuffer);
 	}
 
 	MeshGLInfo::~MeshGLInfo()
 	{
 		glDeleteBuffers(1, &m_indexBuffer);
+		glDeleteBuffers(1, &m_normalBuffer);
 		glDeleteBuffers(1, &m_colorBuffer);
 		glDeleteBuffers(1, &m_positionBuffer);
 	}
@@ -26,8 +28,11 @@ namespace cg
         glBindBuffer(GL_ARRAY_BUFFER, info->m_positionBuffer);
         glBufferData(GL_ARRAY_BUFFER, meshData.vertices.size() * sizeof(glm::vec3), meshData.vertices.data(), GL_STATIC_DRAW);
 
-        glBindBuffer(GL_ARRAY_BUFFER, info->m_colorBuffer);
-        glBufferData(GL_ARRAY_BUFFER, meshData.colors.size() * sizeof(glm::vec3), meshData.colors.data(), GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, info->m_colorBuffer);
+		glBufferData(GL_ARRAY_BUFFER, meshData.colors.size() * sizeof(glm::vec3), meshData.colors.data(), GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ARRAY_BUFFER, info->m_normalBuffer);
+		glBufferData(GL_ARRAY_BUFFER, meshData.normals.size() * sizeof(glm::vec3), meshData.normals.data(), GL_STATIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, info->m_indexBuffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, meshData.indices.size() * sizeof(GLushort), meshData.indices.data(), GL_STATIC_DRAW);

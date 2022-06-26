@@ -44,6 +44,7 @@ namespace cg
 
 		m_vao.bindShaderAttribVec3f(m_meshInfo->getPositionBufferID(), m_shader, "position");
 		m_vao.bindShaderAttribVec3f(m_meshInfo->getColorBufferID(), m_shader, "color");
+		m_vao.bindShaderAttribVec3f(m_meshInfo->getNormalBufferID(), m_shader, "normal");
 		m_vao.bindIndexBuffer(m_meshInfo->getIndexBufferID());
 	}
 
