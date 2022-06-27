@@ -11,6 +11,8 @@
 #include "CG/GeometryUtil.h"
 #include "CG/Window.h"
 
+#include "CG/OBJFile.h"
+
 // Standard window width
 static const int WINDOW_WIDTH = 640;
 // Standard window height
@@ -46,6 +48,34 @@ static float camDistance = 10.0f;
 static const char* shaderSwitch[] = {"default", "phong", "gouraud"};
 static const unsigned int shaderSwitchAmount = 3;
 static unsigned int currentShaderIndex = 0;
+
+static std::vector<cg::MeshData> objMeshes;
+
+static bool loadOBJs()
+{
+    std::string files[] =
+    {
+        "Testobjs/bigguy.obj",
+        "Testobjs/chess_king.obj",
+        "Testobjs/kship3.obj",
+        "Testobjs/kship3_mitNormalenTest.obj",
+        "Testobjs/sonne.obj",
+        "Testobjs/stanford_bunny_closed_withnormals.obj",
+        "Testobjs/suzanne.obj",
+    };
+
+    const int length = sizeof(files) / sizeof(std::string);
+    for (size_t i = 0; i < length; ++i)
+    {
+        std::cout << "Loading " << files[i] << '\n';
+        objMeshes.push_back({});
+        if (!cg::OBJFile::load(files[i], &objMeshes[i]))
+        {
+            return false;
+        }
+    }
+    return true;
+}
 
 static std::tuple<std::shared_ptr<cg::Object>, std::shared_ptr<cg::Object>> createSphereObj(uint8_t sd, float r, const glm::vec3& c, const std::string& shader, const std::string& dbgName = "")
 {
@@ -204,6 +234,22 @@ static void switchNextShader()
     moon2->setShader(cg::ShaderManager::getShader(shaderSwitch[currentShaderIndex]));
 }
 
+static void switchNextModel()
+{
+    static unsigned int currentOBJ = 0;
+
+    currentOBJ = (currentOBJ + 1) % objMeshes.size();
+
+    sphere->setMesh(objMeshes[currentOBJ]);
+
+
+    // Create normals display object for new model
+    cg::MeshData meshNormalObj;
+    cg::GeometryUtil::generateNormalDisplayObj(&meshNormalObj, &objMeshes[currentOBJ]);
+
+    normalsSphere->setMesh(meshNormalObj);
+}
+
 /*
  Resize callback.
  */
@@ -230,6 +276,7 @@ void charCallback(unsigned int keycode)
     case 'z': toggleWireframe(); break;
     case 'l': scene.setUseViewLight(!scene.getUseViewLight()); break;
     case 'h': switchNextShader(); break;
+    case 'm': switchNextModel(); break;
     }
 }
 
@@ -307,6 +354,10 @@ int main(int argc, char** argv)
     }
 #endif
 
+    if (!loadOBJs())
+    {
+        return -3;
+    }
 
     bool result = createScene();
     if (!result)
@@ -321,7 +372,6 @@ int main(int argc, char** argv)
 
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glEnable(GL_DEPTH_TEST);
-
 
     while (!window.getShouldClose())
     {

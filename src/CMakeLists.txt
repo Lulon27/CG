@@ -1,5 +1,5 @@
 set(FILES_CPP	"main.cpp"
-				"GLSLProgram.cpp" "ShaderManager.cpp" "MeshGLInfo.cpp" "Object.cpp" "Scene.cpp" "GeometryUtil.cpp" "Window.cpp" "VertexArrayObject.cpp")
+				"GLSLProgram.cpp" "ShaderManager.cpp" "MeshGLInfo.cpp" "Object.cpp" "Scene.cpp" "GeometryUtil.cpp" "Window.cpp" "VertexArrayObject.cpp" "OBJFile.cpp")
 
 include_directories(CG PUBLIC	"${CMAKE_SOURCE_DIR}/include"
 								"${CMAKE_SOURCE_DIR}/libs/glfw/include"
@@ -22,3 +22,12 @@ configure_file("${CMAKE_SOURCE_DIR}/shader/shadedPhong.vert" "shader/shadedPhong
 
 configure_file("${CMAKE_SOURCE_DIR}/shader/shadedGouraud.frag" "shader/shadedGouraud.frag" COPYONLY)
 configure_file("${CMAKE_SOURCE_DIR}/shader/shadedGouraud.vert" "shader/shadedGouraud.vert" COPYONLY)
+
+
+configure_file("${CMAKE_SOURCE_DIR}/Testobjs/bigguy.obj"					"Testobjs/bigguy.obj" COPYONLY)
+configure_file("${CMAKE_SOURCE_DIR}/Testobjs/chess_king.obj"				"Testobjs/chess_king.obj" COPYONLY)
+configure_file("${CMAKE_SOURCE_DIR}/Testobjs/kship3.obj"					"Testobjs/kship3.obj" COPYONLY)
+configure_file("${CMAKE_SOURCE_DIR}/Testobjs/kship3_mitNormalenTest.obj"	"Testobjs/kship3_mitNormalenTest.obj" COPYONLY)
+configure_file("${CMAKE_SOURCE_DIR}/Testobjs/sonne.obj"						"Testobjs/sonne.obj" COPYONLY)
+configure_file("${CMAKE_SOURCE_DIR}/Testobjs/stanford_bunny_closed_withnormals.obj" "Testobjs/stanford_bunny_closed_withnormals.obj" COPYONLY)
+configure_file("${CMAKE_SOURCE_DIR}/Testobjs/suzanne.obj"					"Testobjs/suzanne.obj" COPYONLY)
