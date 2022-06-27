@@ -40,6 +40,8 @@ static std::shared_ptr<cg::Object> normalsPlanet;
 static std::shared_ptr<cg::Object> normalsMoon1;
 static std::shared_ptr<cg::Object> normalsMoon2;
 
+static std::shared_ptr<cg::Object> box;
+
 static cg::Window window(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 static float rotationSpeed = 0.2f;
@@ -159,6 +161,12 @@ bool createScene()
     origin->setMesh(mesh);
     origin->setShader(cg::ShaderManager::getShader("default"));
 
+    //Box
+    box = std::make_shared<cg::Object>("Bounding Box");
+    box->setShader(cg::ShaderManager::getShader("default"));
+    cg::GeometryUtil::generateBox(&mesh, { -1, -1, -1 }, {1, 1, 1});
+    box->setMesh(mesh);
+
 
     // Sphere model
     std::tie(sphere, normalsSphere) = createSphereObj(12, 0.75f, {1.0f, 1.0f, 0.0f}, "phong", "Sun");
@@ -190,6 +198,7 @@ bool createScene()
 
     // Add to scene, do not add child objects to scene!
     scene.addObject(origin);
+    scene.addObject(box);
     scene.addObject(sphere);
     scene.addObject(centerRotationAnchor);
 
@@ -259,10 +268,28 @@ static void switchNextModel()
 
 
     // Create normals display object for new model
-    cg::MeshData meshNormalObj;
-    cg::GeometryUtil::generateNormalDisplayObj(&meshNormalObj, &objMeshes[currentOBJ]);
+    cg::MeshData mesh;
+    cg::GeometryUtil::generateNormalDisplayObj(&mesh, &objMeshes[currentOBJ]);
 
-    normalsSphere->setMesh(meshNormalObj);
+    normalsSphere->setMesh(mesh);
+
+    glm::vec3 min(0, 0, 0);
+    glm::vec3 max(0, 0, 0);
+
+    // Calculate Bounding Box
+    for (const auto& vert : objMeshes[currentOBJ].vertices)
+    {
+        min.x = glm::min(min.x, vert.x);
+        min.y = glm::min(min.y, vert.y);
+        min.z = glm::min(min.z, vert.z);
+
+        max.x = glm::max(max.x, vert.x);
+        max.y = glm::max(max.y, vert.y);
+        max.z = glm::max(max.z, vert.z);
+    }
+
+    cg::GeometryUtil::generateBox(&mesh, min, max);
+    box->setMesh(mesh);
 }
 
 /*

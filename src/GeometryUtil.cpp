@@ -255,4 +255,65 @@ namespace cg::GeometryUtil
             model->colors.push_back(color);
         }
     }
+
+    void generateBox(cg::MeshData* model, const glm::vec3& min, const glm::vec3& max, const glm::vec3& color)
+    {
+        model->clearAll();
+        model->drawMode = GL_LINES;
+
+        glm::vec3 dim = max - min;
+        
+        model->vertices.emplace_back(min.x,         min.y,          min.z);
+        model->vertices.emplace_back(min.x + dim.x, min.y,          min.z);
+        model->vertices.emplace_back(min.x,         min.y + dim.y,  min.z);
+        model->vertices.emplace_back(min.x + dim.x, min.y + dim.y,  min.z);
+
+        model->vertices.emplace_back(min.x,         min.y,          min.z + dim.z);
+        model->vertices.emplace_back(min.x + dim.x, min.y,          min.z + dim.z);
+        model->vertices.emplace_back(min.x,         min.y + dim.y,  min.z + dim.z);
+        model->vertices.emplace_back(min.x + dim.x, min.y + dim.y,  min.z + dim.z);
+
+        model->indices.push_back(0);
+        model->indices.push_back(1);
+
+        model->indices.push_back(0);
+        model->indices.push_back(2);
+
+        model->indices.push_back(1);
+        model->indices.push_back(3);
+
+        model->indices.push_back(2);
+        model->indices.push_back(3);
+
+
+        model->indices.push_back(4);
+        model->indices.push_back(5);
+
+        model->indices.push_back(4);
+        model->indices.push_back(6);
+
+        model->indices.push_back(5);
+        model->indices.push_back(7);
+
+        model->indices.push_back(6);
+        model->indices.push_back(7);
+
+
+        model->indices.push_back(0);
+        model->indices.push_back(4);
+
+        model->indices.push_back(1);
+        model->indices.push_back(5);
+
+        model->indices.push_back(2);
+        model->indices.push_back(6);
+
+        model->indices.push_back(3);
+        model->indices.push_back(7);
+
+        for (size_t i = 0; i < 8; ++i)
+        {
+            model->colors.push_back(color);
+        }
+    }
 }
