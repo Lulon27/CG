@@ -30,6 +30,7 @@ static std::shared_ptr<cg::Object> planet;
 static std::shared_ptr<cg::Object> moon1;
 static std::shared_ptr<cg::Object> moon2;
 static std::shared_ptr<cg::Object> moonsRotationAnchor;
+static std::shared_ptr<cg::Object> centerRotationAnchor;
 
 static std::shared_ptr<cg::Object> axisSun;
 static std::shared_ptr<cg::Object> axisPlanet;
@@ -151,6 +152,8 @@ bool createScene()
     // Sphere model
     std::tie(sphere, normalsSphere) = createSphereObj(12, 0.75f, {1.0f, 1.0f, 0.0f}, "phong", "Sun");
 
+    centerRotationAnchor = std::make_shared<cg::Object>();
+
 
     // Planet model
     std::tie(planet, normalsPlanet) = createSphereObj(8, 0.4f, { 0.8f, 0.2f, 0.2f }, "phong", "Planet");
@@ -177,14 +180,15 @@ bool createScene()
     // Add to scene, do not add child objects to scene!
     scene.addObject(origin);
     scene.addObject(sphere);
+    scene.addObject(centerRotationAnchor);
 
     // Make hierarchy
-    sphere->addChild(planet);
+    centerRotationAnchor->addChild(planet);
     planet->addChild(moonsRotationAnchor);
     moonsRotationAnchor->addChild(moon1);
     moonsRotationAnchor->addChild(moon2);
 
-    sphere->addChild(axisSun);
+    centerRotationAnchor->addChild(axisSun);
     planet->addChild(axisPlanet);
 
     scene.getCamera().setPosition(glm::vec3(0.0f, 1.0f, 6.0f));
@@ -312,14 +316,17 @@ static void updateLogic()
     // Smooth acceleration of planet and moons rotation
     inputSlideVal(&rotationSpeed, 0.0f, 2.0f, 0.002f, GLFW_KEY_D, GLFW_KEY_F);
 
-    // Smooth rotation of solar system
-    inputSlideVal(&sphere->rotation.z, 0.0f, 360.0f, 0.2f, GLFW_KEY_W, GLFW_KEY_Q);
-
     // Smooth planet up/down movement
     inputSlideVal(&planet->position.y, -10.0f, 10.0f, 0.015f, GLFW_KEY_I, GLFW_KEY_U);
 
     // Smooth camera zoom
     inputSlideVal(&camDistance, 3.5f, 15.0f, 0.05f, GLFW_KEY_A, GLFW_KEY_S);
+
+    // Smooth object rotation
+    // Swap y and z because of US layout
+    if (window.isKeyDown(GLFW_KEY_X)) sphere->rotation.x += 0.5f;
+    if (window.isKeyDown(GLFW_KEY_Z)) sphere->rotation.y += 0.5f;
+    if (window.isKeyDown(GLFW_KEY_Y)) sphere->rotation.z += 0.5f;
 
     auto camPos = scene.getCamera().getPosition();
     camPos /= glm::length(camPos);
