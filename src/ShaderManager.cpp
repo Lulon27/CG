@@ -2,12 +2,14 @@
 
 namespace cg
 {
+#define VERBOSE_SHADER false
+
     static std::unordered_map<std::string, GLSLProgram> programs;
 
 	bool ShaderManager::loadShader(const std::string& name, std::initializer_list<std::pair<std::string, GLSLShader::GLSLShaderType>> list)
 	{
         // Put an empty program into the map
-		GLSLProgram& program = programs.emplace(std::piecewise_construct, std::make_tuple(name), std::make_tuple()).first->second;
+		GLSLProgram& program = programs.emplace(std::piecewise_construct, std::make_tuple(name), std::make_tuple(VERBOSE_SHADER)).first->second;
 
         for (const auto& [path, type] : list)
         {
