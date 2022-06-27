@@ -39,6 +39,8 @@ namespace cg
 			return;
 		}
 
+		transform = glm::scale(transform, obj->scale);
+
 		glm::mat3 nm = glm::inverseTranspose(glm::mat3(transform));
 		glm::mat4 mv = view * transform;
 

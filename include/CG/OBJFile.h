@@ -9,6 +9,6 @@ namespace cg
 	class OBJFile
 	{
 	public:
-		static bool load(const std::string& path, MeshData* meshData);
+		static bool load(const std::string& path, MeshData* meshData, float scale = 1.0f);
 	};
 }

@@ -27,7 +27,7 @@ namespace cg
 
 	static bool parseLine(const std::string& line, OBJData* objData);
 
-	bool OBJFile::load(const std::string& path, MeshData* meshData)
+	bool OBJFile::load(const std::string& path, MeshData* meshData, float scale)
 	{
 		meshData->clearAll();
 
@@ -61,6 +61,7 @@ namespace cg
 		meshData->vertices = objData.vertices;
 		for (size_t i = 0; i < meshData->vertices.size(); ++i)
 		{
+			meshData->vertices[i] *= scale;
 			meshData->colors.emplace_back(0.8f, 0.1f, 0.1f);
 		}
 		meshData->normals.resize(meshData->vertices.size());

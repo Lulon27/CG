@@ -65,12 +65,23 @@ static bool loadOBJs()
         "Testobjs/suzanne.obj",
     };
 
+    float scale[] =
+    {
+        0.1f,
+        0.25f,
+        0.25f,
+        0.25f,
+        1.0f,
+        0.15f,
+        0.75f
+    };
+
     const int length = sizeof(files) / sizeof(std::string);
     for (size_t i = 0; i < length; ++i)
     {
         std::cout << "Loading " << files[i] << '\n';
         objMeshes.push_back({});
-        if (!cg::OBJFile::load(files[i], &objMeshes[i]))
+        if (!cg::OBJFile::load(files[i], &objMeshes[i], scale[i]))
         {
             return false;
         }
