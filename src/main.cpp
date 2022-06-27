@@ -290,6 +290,9 @@ static void switchNextModel()
 
     cg::GeometryUtil::generateBox(&mesh, min, max);
     box->setMesh(mesh);
+
+    // Reset rotation
+    sphere->rotation = { 0, 0, 0 };
 }
 
 /*
