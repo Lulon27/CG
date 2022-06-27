@@ -13,6 +13,8 @@ namespace cg
 	public:
 		void renderScene();
 		void addObject(std::shared_ptr<Object> obj);
+		void removeObject(std::shared_ptr<Object> obj) { std::erase(m_objects, obj); };
+		bool containsObject(std::shared_ptr<Object> obj) const { return std::find(m_objects.begin(), m_objects.end(), obj) != m_objects.end(); };
 
 		Camera& getCamera() { return m_camera; }
 

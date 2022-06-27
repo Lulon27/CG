@@ -13,7 +13,10 @@ namespace cg
 
 	void Scene::addObject(std::shared_ptr<Object> obj)
 	{
-		m_objects.push_back(obj);
+		if (!containsObject(obj))
+		{
+			m_objects.push_back(obj);
+		}
 	}
 
 	void drawWithTransform(const std::shared_ptr<Object>& obj, glm::mat4x4 transform, VertexArrayObject& vao, const glm::mat4x4& proj, const glm::mat4x4& view, const glm::vec4& lightVec)

@@ -198,7 +198,6 @@ bool createScene()
 
     // Add to scene, do not add child objects to scene!
     scene.addObject(origin);
-    scene.addObject(box);
     scene.addObject(sphere);
     scene.addObject(centerRotationAnchor);
 
@@ -235,6 +234,20 @@ static void toggleNormalsAll()
         planet->removeChild(normalsPlanet);
         moon1->removeChild(normalsMoon1);
         moon2->removeChild(normalsMoon2);
+    }
+}
+
+static void toggleBoundingBox()
+{
+    static bool boundingBox = false;
+    boundingBox = !boundingBox;
+    if (boundingBox)
+    {
+        scene.addObject(box);
+    }
+    else
+    {
+        scene.removeObject(box);
     }
 }
 
@@ -322,6 +335,7 @@ void charCallback(unsigned int keycode)
     case 'l': scene.setUseViewLight(!scene.getUseViewLight()); break;
     case 'h': switchNextShader(); break;
     case 'm': switchNextModel(); break;
+    case 'b': toggleBoundingBox(); break;
     }
 }
 
