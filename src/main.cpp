@@ -318,7 +318,7 @@ void charCallback(unsigned int keycode)
     {
     case 'g': planetStopped = !planetStopped; break;
     case 'n': toggleNormalsAll(); break;
-    case 'z': toggleWireframe(); break;
+    case 'u': toggleWireframe(); break;
     case 'l': scene.setUseViewLight(!scene.getUseViewLight()); break;
     case 'h': switchNextShader(); break;
     case 'm': switchNextModel(); break;
